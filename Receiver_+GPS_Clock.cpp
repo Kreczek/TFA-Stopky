@@ -12,6 +12,7 @@ char sSegment[8];
 byte Second, Minute, Hour;
 AltSoftSerial altSerial;
 TinyGPSPlus gps;
+//8 RX,9 TX GPS
 
 
 void setup() {
