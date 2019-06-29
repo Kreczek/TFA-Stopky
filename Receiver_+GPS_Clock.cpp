@@ -1,3 +1,10 @@
+//hovna bools´hit
+
+
+
+
+
+
 #include <Arduino.h>
 #include <RF24.h>
 #include "LedControl.h"
@@ -13,6 +20,7 @@ byte Second, Minute, Hour;
 AltSoftSerial altSerial;
 TinyGPSPlus gps;
 //8 RX,9 TX GPS
+bool dot;
 
 
 void setup() {
@@ -57,13 +65,16 @@ void loop() {
         Second = gps.time.second();
         Hour   = gps.time.hour();
         sprintf(text, "%02u:%02u:%02u", Hour, Minute, Second);
-
+        
+        if (Second % 2 = 0) { dot = true};
+        else if (Second % 2 = 1) { dot = false;
+//bude to fungovat, cilem je aby na GPS kazdou sudou secondu svitila dotka.. 
         if (lastRadio>10000 && memcmp(sSegment, text, 8)){
           Serial.println(text);
           for (int i=0, j = 8-1; i<8; i++, j--)
           {
               sSegment[i]=text[i];
-              lc.setChar(0, j, sSegment[i], false);
+              lc.setChar(0, j, sSegment[i], dot);
           }
         }
       }
