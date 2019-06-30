@@ -7,6 +7,7 @@ RF24 radio(8, 9); // CE, CSN
 LiquidCrystal_PCF8574 lcd(0x27);
 elapsedMillis casomira;
 elapsedMillis displayRefreshTime;
+elapsedMillis stopRefresh;
 elapsedMillis deBounce;
 
 const byte address[6] = "00001";
@@ -15,8 +16,8 @@ const byte address[6] = "00001";
 volatile unsigned long buffer;
 
 boolean zastaveno;
-boolean resetFlag = false;
-boolean zobrazStop = false;
+boolean resetFlag;
+boolean zobrazStop;
 
 void start () {
   if (resetFlag) {
@@ -36,17 +37,16 @@ void stop () {
 }
 
 void vynulovat () {
-  //Serial.println("00:00:00");
   lcd.setCursor(4, 1);
   lcd.print("00:00:00");
-  radio.write("00:00:00",8);
+  radio.write("000000:",7);
   zastaveno = true;
   resetFlag = true;
 }
 
-
 void setup() {
   radio.begin();
+  //radio.setChannel(0);
   radio.openWritingPipe(address);
   radio.setPALevel(RF24_PA_MIN);
   radio.stopListening();
@@ -74,13 +74,13 @@ void loop() {
     }
 
     if (!zastaveno && displayRefreshTime) {
-      char vystup[8];
+      char vystup[7];
       buffer = casomira;
       uint8_t minuty = buffer / 60000;
       uint8_t sekundy = (buffer % 60000) / 1000;
       uint8_t milisekundy = buffer % 1000 / 10;
-      sprintf(vystup, "%02u:%02u:%02u", minuty, sekundy, milisekundy);
-      radio.write(vystup, 8);
+      sprintf(vystup, "%02u%02u%02u:", minuty, sekundy, milisekundy);
+      radio.write(vystup, 7);
       lcd.setCursor(4, 1);
       lcd.print(vystup);
       displayRefreshTime = 0;
@@ -90,14 +90,23 @@ void loop() {
       vynulovat();
     }
     if (zobrazStop) {
-      char vystup[8];
+      char vystup[7];
       zobrazStop = false;
       uint8_t minuty = buffer / 60000;
       uint8_t sekundy = (buffer % 60000) / 1000;
       uint8_t milisekundy = buffer % 1000 / 10;
-      sprintf(vystup, "%02u:%02u:%02u", minuty, sekundy, milisekundy);
+      sprintf(vystup, "%02u%02u%02u:", minuty, sekundy, milisekundy);
       radio.write(vystup, 8);
       lcd.setCursor(4, 1);
       lcd.print(vystup);
+    }
+    if(zastaveno && stopRefresh > 1000){
+      char vystup[7];
+      uint8_t minuty = buffer / 60000;
+      uint8_t sekundy = (buffer % 60000) / 1000;
+      uint8_t milisekundy = buffer % 1000 / 10;
+      sprintf(vystup, "%02u%02u%02u:", minuty, sekundy, milisekundy);
+      radio.write(vystup, 7);
+      stopRefresh = 0;
     }
 }
