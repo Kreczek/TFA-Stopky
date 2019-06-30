@@ -21,7 +21,7 @@ AltSoftSerial altSerial;
 TinyGPSPlus gps;
 //8 RX,9 TX GPS
 bool dot;
-
+//
 
 void setup() {
   //Serial.begin(9600);
