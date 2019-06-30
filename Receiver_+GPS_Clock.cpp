@@ -1,10 +1,3 @@
-//hovna bools´hit
-
-
-
-
-
-
 #include <Arduino.h>
 #include <RF24.h>
 #include "LedControl.h"
@@ -13,14 +6,15 @@
 #include "elapsedMillis.h"
 RF24 radio(6, 7); // CE, CSN
 const byte address[8] = "00001";
-LedControl lc=LedControl(5,19,18,1);;
+LedControl lc=LedControl(5,19,18,1);
 elapsedMillis lastRadio;
 char sSegment[8];
+byte utc1[]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0};
+byte utc2[]={2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1};
 byte Second, Minute, Hour;
+bool dot;
 AltSoftSerial altSerial;
 TinyGPSPlus gps;
-//8 RX,9 TX GPS
-bool dot;
 
 
 void setup() {
@@ -40,12 +34,12 @@ void setup() {
 }
 void loop() {
   if (radio.available()) {
-    char text[8];
-    radio.read(text, 8);
-    if (text[5]==58) {
+    char text[7];
+    radio.read(text, 7);
+    if (text[6]==58) {
     lastRadio=0;
     //Serial.println(text);
-    for (int i=0, j = 8-1; i<8; i++, j--)
+    for (int i=0, j = 6; i<7; i++, j--)
     {
       if(text[i]!=sSegment[i]){
         sSegment[i]=text[i];
@@ -60,21 +54,18 @@ void loop() {
     {
       if (gps.time.isValid())
       {
-        char text[8];
+        char text[6];
         Minute = gps.time.minute();
         Second = gps.time.second();
         Hour   = gps.time.hour();
-        sprintf(text, "%02u:%02u:%02u", Hour, Minute, Second);
-        
-        if (Second % 2 = 0) { dot = true};
-        else if (Second % 2 = 1) { dot = false;
-//bude to fungovat, cilem je aby na GPS kazdou sudou secondu svitila dotka.. 
+        sprintf(text, "%02u%02u%02u", utc2[Hour], Minute, Second);
+
         if (lastRadio>10000 && memcmp(sSegment, text, 8)){
-          Serial.println(text);
-          for (int i=0, j = 8-1; i<8; i++, j--)
+          dot!=dot;
+          for (int i=0, j = 6; i<7; i++, j--)
           {
               sSegment[i]=text[i];
-              lc.setChar(0, j, sSegment[i], dot);
+              lc.setChar(0, j, sSegment[i], false);
           }
         }
       }
