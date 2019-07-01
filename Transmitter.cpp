@@ -107,7 +107,7 @@ void loop() {
       uint8_t milisekundy = buffer % 1000 / 10;
        //sprintf(vystupRF, "%02u%02u%02u:", minuty, sekundy, milisekundy);
       sprintf(vystup, "%02u:%02u%:02u", minuty, sekundy, milisekundy);
-  sprintf(vystupRF, "%02u%02u%02u:", minuty, sekundy, milisekundy);
+      sprintf(vystupRF, "%02u%02u%02u:", minuty, sekundy, milisekundy);
       radio.write(vystupRF, 7);
       lcd.setCursor(4, 1);
       lcd.print(vystup);
