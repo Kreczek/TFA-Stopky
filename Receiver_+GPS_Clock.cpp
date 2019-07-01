@@ -61,7 +61,7 @@ void loop() {
         sprintf(text, "%02u%02u%02u", utc2[Hour], Minute, Second);
 
         if (lastRadio>10000 && memcmp(sSegment, text, 8)){
-          dot!=dot;
+          dot =! dot;
           for (int i=0, j = 6; i<7; i++, j--)
           {
               sSegment[i]=text[i];
