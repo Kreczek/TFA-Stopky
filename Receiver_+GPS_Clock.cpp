@@ -43,7 +43,7 @@ byte utc1[]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0};
 byte utc2[]={2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0,1};
 byte Second, Minute, Hour;
 byte light = 15;
-int lux ;
+uint16_t lux ;
 bool dot;
 
 AltSoftSerial altSerial;
@@ -128,13 +128,11 @@ currentMillis = millis();  //get the current "time" (actually the number of mill
   
    if (digitalRead(A3) == LOW){
   char txt[6];
-   sprintf(txt, lux);
+   sprintf(txt, "%04u",lux);}
     for (int i=0, j = 5; i<6; i++, j--)
     {
       if(txt[i]!=sSegment[i]){
     sSegment[i]=txt[i];
-         
-        
         
        lc.setChar(0, j, sSegment[i], false);
           }
