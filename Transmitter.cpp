@@ -32,6 +32,7 @@ void start () {
     casomira = buffer;
     zastaveno = false;
   }
+ resetFlag = false;
 }
 
 void stop () {
