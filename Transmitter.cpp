@@ -19,9 +19,10 @@ const byte address[6] = "00001";
 //LiquidCrystal lcd(A5, A4, A3, A2, A1, A0);
 volatile unsigned long buffer;
 
-boolean zastaveno;
-boolean resetFlag;
-boolean zobrazStop;
+volatile boolean zastaveno;
+volatile boolean resetFlag;
+volatile boolean zobrazStop;
+volatile uint8_t repeat = 0;
 
 void start () {
   if (resetFlag) {
@@ -39,6 +40,9 @@ void stop () {
   buffer = casomira;
   zastaveno = true;
   zobrazStop = true;
+  stopRefresh = 0;
+  repeat = 0;
+  
 }
 
 void vynulovat () {
@@ -99,10 +103,9 @@ void loop() {
       deBounce = 0;
       vynulovat();
     }
-    if (zobrazStop) {
+    if (zobrazStop && repeat < 3) {
       char vystup[8];
       char vystupRF[7];
-      zobrazStop = false;
       uint8_t minuty = buffer / 60000;
       uint8_t sekundy = (buffer % 60000) / 1000;
       uint8_t milisekundy = buffer % 1000 / 10;
@@ -112,6 +115,8 @@ void loop() {
       radio.write(vystupRF, 7);
       lcd.setCursor(4, 1);
       lcd.print(vystup);
+      repeat++;
+      stopRefresh = 0;
     }
     if(zastaveno && stopRefresh > 1000){
       char vystup[8];
